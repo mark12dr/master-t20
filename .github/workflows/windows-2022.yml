@@ -9,7 +9,7 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: 🧰 تحميل Ngrok وملفات التشغيل
+      - name: 🧰 تحميل Ngrok وتهيئة الملفات
         run: |
           Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
           Expand-Archive ngrok.zip -DestinationPath ngrok
@@ -19,11 +19,11 @@ jobs:
         env:
           NGROK_AUTH: ${{ secrets.TAKEN }}
 
-      - name: 🖥️ تفعيل RDP والجدار الناري
+      - name: 🖥️ تفعيل RDP وضبط كلمة المرور
         run: |
           Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-          net user runneradmin 123456
-          
+          net user runneradmin Aa123456!
+
       - name: 🚪 بدء نفق ngrok على المنفذ 3389
         run: .\ngrok\ngrok.exe tcp 3389
