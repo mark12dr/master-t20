@@ -1,36 +1,31 @@
-name: WINDOWS 2022 RDP
+name: RDP - Windows Server 2022
 
 on:
   workflow_dispatch
 
 jobs:
-  build:
+  start-rdp:
     runs-on: windows-2022
     timeout-minutes: 360
 
     steps:
-      - name: Download Ngrok & Scripts
+      - name: 🧰 تحميل Ngrok وملفات التشغيل
         run: |
           Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
+          Expand-Archive ngrok.zip -DestinationPath ngrok
           Invoke-WebRequest https://raw.githubusercontent.com/Riders004/rdp/master/start.bat -OutFile start.bat
-          Invoke-WebRequest https://raw.githubusercontent.com/Vip3rLi0n/Ngrok-RDPs/main/resources/loop.ps1 -OutFile loop.ps1
-          
-      - name: Extract Ngrok
-        run: Expand-Archive ngrok.zip -DestinationPath ngrok
 
-      - name: Authenticate Ngrok
+      - name: 🔐 تسجيل الدخول إلى ngrok
         run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH
         env:
           NGROK_AUTH: ${{ secrets.TAKEN }}
 
-      - name: Enable RDP Access
+      - name: 🖥️ تفعيل RDP وفتح الجدار الناري
         run: |
-          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -Value 0
+          Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+          net user runneradmin 123456 /add
+          net localgroup administrators runneradmin /add
 
-      - name: Start Ngrok Tunnel
-        run: .\ngrok\ngrok.exe tcp --region=eu 3389
-
-      - name: Execute Startup Script
-        run: cmd /c start.bat
+      - name: 🚪 بدء نفق ngrok على المنفذ 3389
+        run: .\ngrok\ngrok.exe tcp 3389
