@@ -1,18 +1,16 @@
-name: RDP with LocalXpose (Fixed)
+name: RDP with LocalXpose
 
 on: [workflow_dispatch]
 
 jobs:
   build:
-    runs-on: windows-2022
+    runs-on: windows-latest
     timeout-minutes: 360
 
     steps:
-    - name: ⬇️ Download LocalXpose (working)
+    - name: ⬇️ Download LocalXpose executable (GitHub release)
       run: |
-        Invoke-WebRequest "https://api.localxpose.io/api/v2/downloads/localxpose/windows/amd64" -OutFile lx.zip
-        Expand-Archive lx.zip -DestinationPath .
-        Rename-Item .\localxpose.exe lx.exe
+        Invoke-WebRequest -Uri "https://github.com/localxpose/localxpose/releases/download/v1.4.17/localxpose-windows-amd64.exe" -OutFile "lx.exe"
 
     - name: 🔐 Login to LocalXpose
       env:
@@ -25,5 +23,5 @@ jobs:
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         net user runneradmin Aa123456!
 
-    - name: 🚪 Start RDP Tunnel via LocalXpose
+    - name: 🚪 Start RDP Tunnel
       run: Start-Process .\lx.exe -ArgumentList "tcp --port 3389"
