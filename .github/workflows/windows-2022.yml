@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: 🧰 تحميل LocalXpose
         run: |
-          Invoke-WebRequest https://github.com/localxpose/localxpose/releases/download/v1.4.17/localxpose-windows-amd64.exe -OutFile lx.exe
+          curl -L -o lx.exe https://github.com/localxpose/localxpose/releases/download/v1.4.17/localxpose-windows-amd64.exe
 
       - name: 🔐 تسجيل الدخول إلى LocalXpose
         run: .\lx.exe login $Env:LOCALXPOSE_TOKEN
