@@ -1,28 +1,22 @@
-name: RDP - Windows Server 2022
+name: RDP with LocalXpose
 
-on:
-  workflow_dispatch
+on: [workflow_dispatch]
 
 jobs:
-  start-rdp:
-    runs-on: windows-2022
-    timeout-minutes: 360
+  build:
+    runs-on: windows-latest
 
     steps:
-      - name: 🧰 تحميل LocalXpose
-        run: |
-          curl -L -o lx.exe https://github.com/localxpose/localxpose/releases/download/v1.4.17/localxpose-windows-x64.exe
+    - name: Download LocalXpose
+      run: |
+        Invoke-WebRequest -Uri "https://github.com/localxpose/localxpose/releases/download/v1.4.17/localxpose-windows-x86_64.exe" -OutFile "lx.exe"
 
-      - name: 🔐 تسجيل الدخول إلى LocalXpose
-        run: .\lx.exe login $Env:LOCALXPOSE_TOKEN
-        env:
-          LOCALXPOSE_TOKEN: ${{ secrets.LOCALXPOSE_TOKEN }}
+    - name: Login to LocalXpose
+      env:
+        LOCALXPOSE_TOKEN: your_token_here
+      run: |
+        .\lx.exe login $Env:LOCALXPOSE_TOKEN
 
-      - name: 🖥️ تفعيل RDP وضبط كلمة المرور
-        run: |
-          Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
-          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-          net user runneradmin Aa123456!
-
-      - name: 🚪 فتح نفق RDP على المنفذ 3389
-        run: .\lx.exe tunnel --port 3389 --proto tcp
+    - name: Start Tunnel
+      run: |
+        Start-Process .\lx.exe -ArgumentList "tcp --port 3389"
