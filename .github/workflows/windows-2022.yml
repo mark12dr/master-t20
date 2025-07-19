@@ -13,7 +13,7 @@ jobs:
 
     - name: Login to LocalXpose
       env:
-        LOCALXPOSE_TOKEN: your_token_here
+        LOCALXPOSE_TOKEN: vzUTxjFmcsvnQvNoTJtMmZ8oafplO0GCHoLgIKi2
       run: |
         .\lx.exe login $Env:LOCALXPOSE_TOKEN
 
