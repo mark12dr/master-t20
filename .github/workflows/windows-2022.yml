@@ -1,22 +1,29 @@
-name: RDP with LocalXpose
+name: RDP with LocalXpose (Fixed)
 
 on: [workflow_dispatch]
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
+    timeout-minutes: 360
 
     steps:
-    - name: Download LocalXpose
+    - name: ⬇️ Download LocalXpose (working)
       run: |
-        curl -L -o lx.exe "https://cdn.discordapp.com/attachments/1242453331223343124/1247328798899810335/localxpose-windows-x86_64.exe"
+        Invoke-WebRequest "https://api.localxpose.io/api/v2/downloads/localxpose/windows/amd64" -OutFile lx.zip
+        Expand-Archive lx.zip -DestinationPath .
+        Rename-Item .\localxpose.exe lx.exe
 
-    - name: Login to LocalXpose
+    - name: 🔐 Login to LocalXpose
       env:
-        LOCALXPOSE_TOKEN: vzUTxjFmcsvnQvNoTJtMmZ8oafplO0GCHoLgIKi2
-      run: |
-        .\lx.exe login $Env:LOCALXPOSE_TOKEN
+        LOCALXPOSE_TOKEN: ${{ secrets.LOCALXPOSE_TOKEN }}
+      run: .\lx.exe login $Env:LOCALXPOSE_TOKEN
 
-    - name: Start Tunnel
+    - name: 🖥️ Enable RDP and set password
       run: |
-        Start-Process .\lx.exe -ArgumentList "tcp --port 3389"
+        Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        net user runneradmin Aa123456!
+
+    - name: 🚪 Start RDP Tunnel via LocalXpose
+      run: Start-Process .\lx.exe -ArgumentList "tcp --port 3389"
