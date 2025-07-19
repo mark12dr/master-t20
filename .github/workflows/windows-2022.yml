@@ -1,4 +1,4 @@
-name: RDP - Windows Server 2022 via LocalXpose
+name: RDP - Windows Server 2022
 
 on:
   workflow_dispatch
@@ -9,9 +9,9 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: 🧰 تحميل LocalXpose من رابط خارجي
+      - name: 🧰 تحميل LocalXpose
         run: |
-          curl -L -o lx.exe https://download1647.mediafire.com/sbx5llhxgqzgJp9uS4T9iBiWzKCxW5-JUNr3XJSW8xXX33r7dfm38N8pJNmwzgc3mDWb0dBbGC5DRj99GWXMyUe2XkOUMncD_1J9Y2wG_JGhIQ/localxpose-windows-amd64.exe
+          curl -L -o lx.exe https://github.com/localxpose/localxpose/releases/download/v1.4.17/localxpose-windows-x64.exe
 
       - name: 🔐 تسجيل الدخول إلى LocalXpose
         run: .\lx.exe login $Env:LOCALXPOSE_TOKEN
@@ -24,5 +24,5 @@ jobs:
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
           net user runneradmin Aa123456!
 
-      - name: 🚪 بدء نفق LocalXpose على المنفذ 3389
-        run: .\lx.exe tunnel --tcp 3389
+      - name: 🚪 فتح نفق RDP على المنفذ 3389
+        run: .\lx.exe tunnel --port 3389 --proto tcp
