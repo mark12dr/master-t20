@@ -1,4 +1,4 @@
-name: RDP - Windows Server 2022
+name: RDP - Windows Server 2022 via LocalXpose
 
 on:
   workflow_dispatch
@@ -9,15 +9,14 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: 🧰 تحميل Ngrok وتهيئة الملفات
+      - name: 🧰 تحميل LocalXpose
         run: |
-          Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
-          Expand-Archive ngrok.zip -DestinationPath ngrok
+          Invoke-WebRequest https://localxpose.io/downloads/localxpose-windows-amd64.exe -OutFile lx.exe
 
-      - name: 🔐 تسجيل الدخول إلى ngrok
-        run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH
+      - name: 🔐 تسجيل الدخول إلى LocalXpose
+        run: .\lx.exe login $Env:LOCALXPOSE_TOKEN
         env:
-          NGROK_AUTH: ${{ secrets.TAKEN }}
+          LOCALXPOSE_TOKEN: ${{ secrets.LOCALXPOSE_TOKEN }}
 
       - name: 🖥️ تفعيل RDP وضبط كلمة المرور
         run: |
@@ -25,5 +24,5 @@ jobs:
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
           net user runneradmin Aa123456!
 
-      - name: 🚪 بدء نفق ngrok على المنفذ 3389
-        run: .\ngrok\ngrok.exe tcp 3389
+      - name: 🚪 بدء نفق LocalXpose على المنفذ 3389
+        run: .\lx.exe tunnel --tcp 3389
